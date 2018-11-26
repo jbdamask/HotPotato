@@ -56,11 +56,16 @@ void setup() {
   randomSeed(seed);
 }
 
+int currentTime = millis();
+
 ///////////////////////////////////////////////////////////////////////////////
 void loop() {
   // Wait for shaking
   while (getTotalAccel() < SHAKE_THRESHOLD) {
     // do nothing
+    if(millis() - currentTime > 10000){
+      CircuitPlayground.clearPixels();
+    }
   }
 
   // Game length
