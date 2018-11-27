@@ -65,7 +65,7 @@ int currentTime = millis();
 void loop() {
   // Wait for shaking
   while (getTotalAccel() < SHAKE_THRESHOLD) {
-    // do nothing
+    // Turn off if idle for 10 seconds
     if(millis() - currentTime > 10000){
       CircuitPlayground.clearPixels();
     }
