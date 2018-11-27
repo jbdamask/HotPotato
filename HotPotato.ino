@@ -1,19 +1,22 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Circuit Playground Hot Potato
 //
-// Author: Carter Nelson (extended by John B. Damask in 2018)
+// Original Author: Carter Nelson 
+// Extended by: John B. Damask 2018 (added fail song and other tunes)
 // MIT License (https://opensource.org/licenses/MIT)
 
 #include <Adafruit_CircuitPlayground.h>
 #include "melody.h"
 #include "fail.h"
-#include "rainingBlood.h"   // Not used yet
+#include "rainingBlood.h"   
 
 #define SHAKE_THRESHOLD     30    // Total acceleration threshold for shake detect
 
 int gameLength;
 uint8_t numNotes; 
 
+int * currentTune;
+int * currentTempo;
 
 ///////////////////////////////////////////////////////////////////////////////
 float getTotalAccel() {
@@ -68,8 +71,23 @@ void loop() {
     }
   }
 
+  int r = random(1,3);
+  Serial.println(r);
+  switch(r){
+    case 1:
+      currentTune = rib;
+      currentTempo = rib_tempo;
+      numNotes = sizeof(rib)/sizeof(int);
+      break;
+    default:
+      currentTune = melody;
+      currentTempo = tempo;
+      numNotes = sizeof(melody)/sizeof(int);
+      break;
+  }
+
   // Game length
-  int gameLength = random(numberOfNotes,3*numberOfNotes);
+  int gameLength = random(numberOfNotes,2*numberOfNotes);
 
   // Game play with melody
   int noteToPlay = 0;
@@ -80,12 +98,12 @@ void loop() {
     CircuitPlayground.setPixelColor(random(0,10), random(256),random(256),random(256)); 
     
     // Play the note
-    int noteDuration = 1000 / tempo[noteToPlay];   
-    CircuitPlayground.playTone(melody[noteToPlay], noteDuration);
-    
+    int noteDuration = 1000 / currentTempo[noteToPlay];
+    CircuitPlayground.playTone(currentTune[noteToPlay], noteDuration);
+        
     // Increment and check the note counter
     noteToPlay++;
-    if (noteToPlay >= numberOfNotes) noteToPlay = 0;    
+    if (noteToPlay >= numNotes) noteToPlay = 0;    
   }
 
   //
@@ -96,7 +114,6 @@ void loop() {
   for (int p=0; p<10; p++) CircuitPlayground.setPixelColor(p, 0xFF0000);
   noteToPlay = 0; // reset
   while(noteToPlay < numberOfFailNotes){    
-    Serial.println("playing fail");
     int noteDuration = 1000 / fail_tempo[noteToPlay];
     CircuitPlayground.playTone(fail[noteToPlay], noteDuration);
     noteToPlay++;    
